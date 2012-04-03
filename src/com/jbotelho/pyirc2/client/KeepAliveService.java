@@ -407,6 +407,7 @@ public class KeepAliveService extends PushService
 
 				log("Connection established to " + s.getInetAddress() +
 				  ":" + mPort);
+                getAppContext().pushClient = new PushClient(s);
 				
 				startKeepAlives();
 				showNotification();
@@ -419,7 +420,7 @@ public class KeepAliveService extends PushService
 				 * even when the remote peer would reject the connection.
 				 * Shortly after an attempt to send data an exception
 				 * will occur indicating the connection was reset. */
-				out.write("READY".getBytes());
+                out.write("\0\0\0\02{}".getBytes());
 
 				byte[] buffer;
 				int n;
@@ -437,13 +438,21 @@ public class KeepAliveService extends PushService
 					// Just make sure it is a reasonable value (less than 32KB)
 					// TODO: Raise this limit properly
 					if (n < 65535) {
-						t = "Message";
-						// Now get the actual data
+                        // First, read in the type
+                        buffer = new byte[n];
+                        reader.readFully(buffer);
+                        t = new String(buffer);
+                        // Now get the actual data
+                        n = reader.readInt();
+                        if (n >= 65535) {
+                            continue;
+                        }
 						buffer = new byte[n];
 						reader.readFully(buffer);							
 						// Parse it as a string, and send it out for processing
 						data = new String(buffer);
-						act.pushData(data, t);
+						getAppContext().pushQueue.add(t);
+						getAppContext().pushQueue.add(data);
 						act.getHandler().post(act.getPushNoitificationRunnable());
 					} else {
 						continue;
@@ -485,8 +494,8 @@ public class KeepAliveService extends PushService
 		  throws IOException
 		{
 			Socket s = mSocket;
-			s.getOutputStream().write("KEEPALIVE".getBytes());
-			
+			s.getOutputStream().write("\0\0\0\02{}".getBytes());
+
 			log("Keep-alive sent.");
 		}
 

@@ -13,17 +13,17 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class ConversationListAdapter extends ArrayAdapter<String> {
+public class ConversationMessagesAdapter extends ArrayAdapter<String> {
 	private Activity context;
 	private LayoutInflater mInflater;
-    private ArrayList<Conversation> conversations;
-	
+    private ArrayList<Message> messages;
 
-	public ConversationListAdapter(Activity context, int resource) {
+
+	public ConversationMessagesAdapter(Activity context, int resource) {
 		super(context, resource);
 		this.context = context;
 		mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        this.conversations = ((ConversationListActivity)getContext()).getAppContext().conversations;
+        this.messages = ((PushActivity)context).getAppContext().messages;
 	}
 	
 
@@ -40,7 +40,7 @@ public class ConversationListAdapter extends ArrayAdapter<String> {
 		}
 		
 		// Get the Message we're displaying
-        Conversation conversation = conversations.get(position);
+        Message message = messages.get(position);
 		
 		// Get the UI elements
 		TextView name = (TextView) row.findViewById(R.id.name);
@@ -48,7 +48,7 @@ public class ConversationListAdapter extends ArrayAdapter<String> {
 		ImageView iv = (ImageView) row.findViewById(R.id.status_icon);
 		
 		// Display the chat's name
-		name.setText(conversation.name);
+		name.setText(message.sender);
 		
 		// Set the name's text color based on the state of the conversation
         name.setTextColor(Color.WHITE);
@@ -56,7 +56,7 @@ public class ConversationListAdapter extends ArrayAdapter<String> {
         // Set the status icon to the chat icon (chats don't have a status)
         iv.setImageResource(R.drawable.status_chat);
         // Set the description
-        status.setText("irc.freenode.net");
+        status.setText(message.body);
 		
 		return row;
 	}
@@ -64,6 +64,6 @@ public class ConversationListAdapter extends ArrayAdapter<String> {
 	
 	@Override
 	public int getCount () {
-		return conversations.size();
+		return messages.size();
 	}
 }

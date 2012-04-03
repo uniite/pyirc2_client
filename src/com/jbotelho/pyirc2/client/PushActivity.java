@@ -24,19 +24,11 @@ public class PushActivity extends android.app.Activity
 	
 	private Runnable pushNoitificationRunnable = new Runnable() {
 	   public void run() {
-		   getAppContext().pushNoitification(incoming, incomingType);
+		   getAppContext().pushNoitification();
 	   }
 	};
 		
 	public Runnable getPushNoitificationRunnable () {
 		return pushNoitificationRunnable;
-	}
-	
-	String incoming = "";
-	String incomingType = "";
-	
-	public void pushData (String incoming, String incomingType) {
-		this.incoming = incoming;
-		this.incomingType = incomingType;
 	}
 }
